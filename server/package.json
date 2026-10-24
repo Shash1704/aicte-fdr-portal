@@ -1,0 +1,20 @@
+{
+  "name": "aicte-fdr-portal-server",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "AICTE Security Deposit / FDR portal - API server",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "seed": "node src/seed-cli.js",
+    "test": "node --test \"test/*.test.js\""
+  },
+  "engines": {
+    "node": ">=22.13"
+  },
+  "dependencies": {
+    "express": "^5.3.0",
+    "multer": "^2.4.0"
+  }
+}
