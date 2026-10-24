@@ -223,7 +223,7 @@ export default function Submit() {
                 {samples?.map((s) => (
                   <li key={s.key}>
                     <button onClick={() => loadSample(s.key).catch((e) => setReadError((e as Error).message))} disabled={!!reading}
-                      className={clsx('w-full rounded-[8px] border p-3 text-left transition hover:border-ink', sampleKey === s.key ? 'border-ink bg-surface-1' : 'border-[var(--hairline)]')}>
+                      className={clsx('w-full rounded-[16px] border p-3 text-left transition hover:border-ink', sampleKey === s.key ? 'border-ink bg-surface-1' : 'border-[var(--hairline)]')}>
                       <span className="flex items-center gap-2 text-sm font-medium"><FlaskConical className="size-4 shrink-0 text-ink-3" />{s.title}</span>
                       <span className="mt-1 block text-xs text-ink-3">{s.expect}</span>
                     </button>
@@ -263,7 +263,7 @@ function FileDrop({ kind, label, file, onPick, required }: { kind: string; label
   return (
     <label onDragOver={(e) => { e.preventDefault(); setOver(true); }} onDragLeave={() => setOver(false)}
       onDrop={(e) => { e.preventDefault(); setOver(false); const fl = e.dataTransfer.files?.[0]; if (fl) onPick(kind, fl); }}
-      className={clsx('flex cursor-pointer items-center gap-3 rounded-[8px] border border-dashed p-4 transition', over ? 'border-ink bg-surface-2' : 'border-[var(--axis)] hover:border-ink')}>
+      className={clsx('flex cursor-pointer items-center gap-3 rounded-[16px] border border-dashed p-4 transition', over ? 'border-ink bg-surface-2' : 'border-[var(--axis)] hover:border-ink')}>
       {file ? <FileCheck2 className="size-5 shrink-0 text-good-text" /> : <Upload className="size-5 shrink-0 text-ink-3" />}
       <span className="min-w-0 flex-1">
         <span className="block text-sm">{label}{required && <span className="text-critical-text"> *</span>}</span>
@@ -284,9 +284,9 @@ function InstitutionPicker({ value, onPick }: { value: string; onPick: (id: numb
       <div className="relative">
         <Input value={open ? q : value || q} placeholder="Search name or AICTE ID" onFocus={() => setOpen(true)} onChange={(e) => { setQ(e.target.value); setOpen(true); }} />
         {open && data && (
-          <div className="glass-pop absolute left-0 right-0 top-11 z-30 max-h-72 overflow-auto rounded-[8px] p-1">
+          <div className="glass-pop absolute left-0 right-0 top-11 z-30 max-h-72 overflow-auto rounded-[16px] p-1">
             {data.rows.map((i) => (
-              <button key={i.id} type="button" className="block w-full rounded-[6px] px-3 py-2 text-left hover:bg-surface-2" onClick={() => { onPick(i.id, i.name); setOpen(false); setQ(''); }}>
+              <button key={i.id} type="button" className="block w-full rounded-[12px] px-3 py-2 text-left hover:bg-surface-2" onClick={() => { onPick(i.id, i.name); setOpen(false); setQ(''); }}>
                 <span className="block truncate text-sm">{i.name}</span><span className="text-xs text-ink-3">{i.aicte_id} · {i.city}</span>
               </button>
             ))}

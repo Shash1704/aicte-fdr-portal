@@ -10,17 +10,17 @@ import type { Severity, Status, Validity, Verification } from '../lib/types';
 
 export function Card({ title, subtitle, actions, children, className, bodyClass, id }: { title?: ReactNode; subtitle?: ReactNode; actions?: ReactNode; children: ReactNode; className?: string; bodyClass?: string; id?: string }) {
   return (
-    <section id={id} className={clsx('glass rounded-[10px]', className)}>
+    <section id={id} className={clsx('glass rounded-[24px]', className)}>
       {(title || actions) && (
-        <header className="flex flex-wrap items-start justify-between gap-2 px-5 pb-2 pt-5">
+        <header className="flex flex-wrap items-start justify-between gap-2 px-6 pb-2 pt-5">
           <div className="min-w-0">
-            {title && <h2 className="text-[13px] text-ink">{title}</h2>}
+            {title && <h2 className="text-[16px] text-ink">{title}</h2>}
             {subtitle && <p className="mt-0.5 text-xs text-ink-3">{subtitle}</p>}
           </div>
           {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
         </header>
       )}
-      <div className={clsx('p-5', (title || actions) && 'pt-3', bodyClass)}>{children}</div>
+      <div className={clsx('p-6', (title || actions) && 'pt-3', bodyClass)}>{children}</div>
     </section>
   );
 }
@@ -39,8 +39,8 @@ export function PageHeader({ title, subtitle, actions, crumbs }: { title: ReactN
             ))}
           </nav>
         )}
-        <h1 className="text-[24px] leading-tight text-ink sm:text-[30px]">{title}</h1>
-        {subtitle && <p className="mt-1 text-sm text-ink-3">{subtitle}</p>}
+        <h1 className="text-[28px] leading-tight text-ink sm:text-[36px]">{title}</h1>
+        {subtitle && <p className={clsx('mt-1.5 text-ink-3', typeof subtitle === 'string' && subtitle.length <= 48 ? 'eyebrow' : 'text-sm')}>{subtitle}</p>}
       </div>
       {actions && <div className="no-print flex flex-wrap items-center gap-2">{actions}</div>}
     </div>
@@ -54,10 +54,10 @@ export function Button({ variant = 'secondary', size = 'md', className, loading,
       {...rest}
       disabled={rest.disabled || loading}
       className={clsx(
-        'inline-flex items-center justify-center gap-1.5 rounded-[4px] font-medium uppercase tracking-[0.14em] transition-all disabled:cursor-not-allowed disabled:opacity-50',
-        size === 'sm' ? 'h-8 px-3 text-[10px]' : 'h-10 px-5 text-[11px]',
-        variant === 'primary' && 'btn-raised hover:brightness-125',
-        variant === 'secondary' && 'border border-[var(--axis)] text-ink hover:border-ink',
+        'inline-flex items-center justify-center gap-1.5 rounded-full font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-50',
+        size === 'sm' ? 'h-8 px-3.5 text-[12px]' : 'h-11 px-5 text-[13px]',
+        variant === 'primary' && 'btn-raised hover:brightness-105',
+        variant === 'secondary' && 'bg-surface-2 text-ink hover:bg-surface-3',
         variant === 'ghost' && 'text-ink-2 hover:bg-surface-2 hover:text-ink',
         variant === 'danger' && 'bg-critical text-white shadow-[0_10px_26px_-10px_var(--critical)] hover:brightness-110',
         className,
@@ -72,18 +72,18 @@ export function Button({ variant = 'secondary', size = 'md', className, loading,
 export function Field({ label, hint, children, className, required }: { label: string; hint?: ReactNode; children: ReactNode; className?: string; required?: boolean }) {
   return (
     <label className={clsx('block', className)}>
-      <span className="eyebrow mb-0.5 block text-ink-3">{label}{required && <span className="text-critical-text"> *</span>}</span>
+      <span className="mb-1.5 block text-xs font-medium text-ink-3">{label}{required && <span className="text-critical-text"> *</span>}</span>
       {children}
       {hint && <span className="mt-1 block text-xs text-ink-3">{hint}</span>}
     </label>
   );
 }
-const ctlBase = 'border-0 border-b border-[var(--axis)] bg-transparent px-1 text-sm text-ink placeholder:text-ink-3 transition-colors focus:border-ink focus:outline-none';
+const ctlBase = 'rounded-2xl border border-transparent bg-surface-2 px-3.5 text-sm text-ink placeholder:text-ink-3 transition-colors focus:border-accent/70 focus:outline-none disabled:opacity-60';
 // Full width unless the caller sets its own width.
 const ctl = (className?: string) => clsx(ctlBase, !/(^|\s)(w-|min-w-)/.test(className ?? '') && 'w-full', className);
-export const Input = ({ className, ...p }: InputHTMLAttributes<HTMLInputElement>) => <input {...p} className={clsx(ctl(className), 'h-10 rounded-none')} />;
-export const Textarea = ({ className, ...p }: TextareaHTMLAttributes<HTMLTextAreaElement>) => <textarea {...p} className={clsx(ctl(className), 'rounded-none py-2.5')} />;
-export const Select = ({ className, children, ...p }: SelectHTMLAttributes<HTMLSelectElement>) => <select {...p} className={clsx(ctl(className), 'h-10 rounded-none pr-6')}>{children}</select>;
+export const Input = ({ className, ...p }: InputHTMLAttributes<HTMLInputElement>) => <input {...p} className={clsx(ctl(className), 'h-11')} />;
+export const Textarea = ({ className, ...p }: TextareaHTMLAttributes<HTMLTextAreaElement>) => <textarea {...p} className={clsx(ctl(className), 'py-2.5')} />;
+export const Select = ({ className, children, ...p }: SelectHTMLAttributes<HTMLSelectElement>) => <select {...p} className={clsx(ctl(className), 'h-11 pr-8')}>{children}</select>;
 
 export function Spinner({ label = 'Loading…' }: { label?: string }) {
   return <div className="flex items-center justify-center gap-2 py-10 text-sm text-ink-3"><LoaderCircle className="size-5 animate-spin" />{label}</div>;
@@ -99,7 +99,7 @@ export function Empty({ icon, title, body }: { icon?: ReactNode; title: string; 
 }
 export function ErrorBox({ error }: { error: unknown }) {
   if (!error) return null;
-  return <div className="rounded-lg border border-critical/30 bg-critical-soft px-3.5 py-2.5 text-sm text-critical-text">{(error as Error).message || String(error)}</div>;
+  return <div className="rounded-xl border border-critical/30 bg-critical-soft px-3.5 py-2.5 text-sm text-critical-text">{(error as Error).message || String(error)}</div>;
 }
 
 // ---------- badges ----------
@@ -174,13 +174,13 @@ export function Pill({ children, className }: { children: ReactNode; className?:
 export function Tabs<T extends string>({ tabs, value, onChange }: { tabs: Array<{ value: T; label: ReactNode; count?: number }>; value: T; onChange: (v: T) => void }) {
   return (
     <div className="no-print mb-5 max-w-full overflow-x-auto">
-      <div className="inline-flex gap-2" role="tablist">
+      <div className="inline-flex gap-1 rounded-full bg-panel p-1.5" role="tablist">
       {tabs.map((t) => (
         <button key={t.value} role="tab" aria-selected={value === t.value} onClick={() => onChange(t.value)}
-          className={clsx('eyebrow flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-[4px] px-4 py-2.5 transition-all',
-            value === t.value ? 'btn-raised' : 'text-ink-3 hover:text-ink')}>
+          className={clsx('flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-4 py-2 text-[13px] font-semibold transition-all',
+            value === t.value ? 'bg-accent text-accent-ink' : 'text-ink-3 hover:text-ink')}>
           {t.label}
-          {t.count !== undefined && <span className={clsx('rounded-full px-1.5 text-[11px] tnum', value === t.value ? 'bg-white/15' : 'bg-surface-2 text-ink-2')}>{t.count}</span>}
+          {t.count !== undefined && <span className={clsx('rounded-full px-1.5 text-[11px] tnum', value === t.value ? 'bg-black/15' : 'bg-surface-2 text-ink-2')}>{t.count}</span>}
         </button>
       ))}
       </div>
@@ -199,9 +199,9 @@ export function Modal({ open, onClose, title, children, footer, wide }: { open: 
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 p-0 backdrop-blur-sm sm:items-center sm:p-4" onMouseDown={onClose}>
-      <div role="dialog" aria-modal className={clsx('glass-pop max-h-[92vh] w-full overflow-auto rounded-t-[10px] sm:rounded-[10px]', wide ? 'sm:max-w-3xl' : 'sm:max-w-lg')} onMouseDown={(e) => e.stopPropagation()}>
+      <div role="dialog" aria-modal className={clsx('glass-pop max-h-[92vh] w-full overflow-auto rounded-t-[24px] sm:rounded-[24px]', wide ? 'sm:max-w-3xl' : 'sm:max-w-lg')} onMouseDown={(e) => e.stopPropagation()}>
         <div className="sticky top-0 z-10 flex items-center justify-between bg-[var(--popover)] px-6 pb-2 pt-5">
-          <h3 className="text-sm">{title}</h3>
+          <h3 className="text-base">{title}</h3>
           <button onClick={onClose} className="rounded-full p-1.5 text-ink-3 hover:bg-surface-2" aria-label="Close"><X className="size-5" /></button>
         </div>
         <div className="px-6 py-3">{children}</div>
@@ -214,7 +214,7 @@ export function Modal({ open, onClose, title, children, footer, wide }: { open: 
 export function KeyVal({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="min-w-0">
-      <dt className="eyebrow text-[9.5px] text-ink-3">{label}</dt>
+      <dt className="text-[11px] font-medium text-ink-3">{label}</dt>
       <dd className="mt-0.5 break-words text-sm text-ink">{children ?? '—'}</dd>
     </div>
   );
@@ -225,7 +225,7 @@ export function ScoreBar({ value, className }: { value: number; className?: stri
   return (
     <span className={clsx('inline-flex items-center gap-1.5', className)} title={`${pct}% match`}>
       <span className="h-1.5 w-14 overflow-hidden rounded-full bg-surface-3">
-        <span className="block h-full rounded-full bg-sun" style={{ width: `${pct}%` }} />
+        <span className="block h-full rounded-full bg-accent" style={{ width: `${pct}%` }} />
       </span>
       <span className="text-xs tnum text-ink-2">{pct}%</span>
     </span>

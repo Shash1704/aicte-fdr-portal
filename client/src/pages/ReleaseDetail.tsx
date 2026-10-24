@@ -58,7 +58,7 @@ export default function ReleaseDetail() {
             const done = !!r[s.at] && (i <= stageIdx || r.status === 'Released' || (r.status === 'Returned' && i === 0));
             const current = i === stageIdx + 1 && open && r.status !== 'Returned';
             return (
-              <li key={s.key} className={clsx('rounded-[8px] p-3', done ? 'bg-good-soft' : current ? 'border border-ink' : 'tile')}>
+              <li key={s.key} className={clsx('rounded-[16px] p-3', done ? 'bg-good-soft' : current ? 'border border-ink' : 'tile')}>
                 <div className="flex items-center gap-1.5 text-xs font-medium">{done ? <CheckCircle2 className="size-4 text-good-text" /> : current ? <CircleDashed className="size-4" /> : <CircleDashed className="size-4 text-muted" />}{s.label}</div>
                 <div className="mt-1 text-[11px] text-ink-3">{done ? <>{String(r[s.by] ?? s.who)}<br />{fmtDateTime(String(r[s.at]))}</> : s.who}</div>
               </li>
@@ -115,7 +115,7 @@ export default function ReleaseDetail() {
             <Card title="Documents">
               <ul className="space-y-1">
                 {r.documents.map((d) => (
-                  <li key={d.id}><button className="flex w-full items-center gap-2 rounded-[6px] px-1 py-1.5 text-left text-sm hover:bg-surface-2" onClick={() => openDocument(d.id)}><FileText className="size-4 text-ink-3" />{d.kind === 'RELEASE_LETTER' ? 'Release letter' : d.filename}</button></li>
+                  <li key={d.id}><button className="flex w-full items-center gap-2 rounded-[12px] px-1 py-1.5 text-left text-sm hover:bg-surface-2" onClick={() => openDocument(d.id)}><FileText className="size-4 text-ink-3" />{d.kind === 'RELEASE_LETTER' ? 'Release letter' : d.filename}</button></li>
                 ))}
               </ul>
             </Card>

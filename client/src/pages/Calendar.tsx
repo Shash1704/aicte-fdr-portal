@@ -55,7 +55,7 @@ export default function Calendar() {
               const isToday = d === today;
               return (
                 <button key={d} onClick={() => setDay(day === d ? null : d)}
-                  className={clsx('flex min-h-[74px] flex-col rounded-[6px] p-1.5 text-left transition sm:min-h-[92px]', day === d ? 'bg-surface-3 ring-1 ring-ink' : items.length ? 'bg-surface-1 hover:bg-surface-2' : 'hover:bg-surface-1', d < today && 'opacity-60')}>
+                  className={clsx('flex min-h-[74px] flex-col rounded-[12px] p-1.5 text-left transition sm:min-h-[92px]', day === d ? 'bg-surface-3 ring-1 ring-ink' : items.length ? 'bg-surface-1 hover:bg-surface-2' : 'hover:bg-surface-1', d < today && 'opacity-60')}>
                   <span className={clsx('text-xs tnum', isToday ? 'flex size-5 items-center justify-center rounded-full bg-accent font-semibold text-accent-ink' : 'text-ink-3')}>{Number(d.slice(8))}</span>
                   <span className="mt-1 flex flex-wrap gap-0.5">
                     {items.slice(0, 8).map((r) => <span key={r.id} title={`${r.ref_no} · ${r.institution_name}`} className="size-2 rounded-full" style={{ background: r.validity === 'expiring' || r.validity === 'lapsed' ? 'var(--warning)' : r.validity === 'renewal_submitted' ? 'var(--s1)' : 'var(--good)' }} />)}

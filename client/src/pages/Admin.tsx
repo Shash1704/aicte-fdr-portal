@@ -174,7 +174,7 @@ function Sandbox() {
         <Button variant="primary" loading={look.isPending} onClick={() => look.mutate()}><Landmark className="size-4" />Look up</Button>
       </div>
       {look.data && (
-        <div className="mt-5 rounded-[8px] border border-[var(--hairline)] p-4 text-sm">
+        <div className="mt-5 rounded-[16px] border border-[var(--hairline)] p-4 text-sm">
           <div className="flex items-center gap-2 font-medium">{look.data.status === 'found' ? <CheckCircle2 className="size-4 text-good-text" /> : <ShieldAlert className="size-4 text-warning-text" />}{look.data.status} <span className="text-xs font-normal text-ink-3">ref {look.data.ref}</span></div>
           {look.data.record && <pre className="mt-2 overflow-auto text-xs text-ink-2">{JSON.stringify(look.data.record, null, 2)}</pre>}
         </div>

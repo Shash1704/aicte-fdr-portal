@@ -29,7 +29,7 @@ export default function InstitutionDetail() {
               {d.compliance.map((c) => {
                 const ok = c.held >= c.required && !c.lapsed;
                 return (
-                  <div key={c.purpose} className="tile rounded-[8px] p-3">
+                  <div key={c.purpose} className="tile rounded-[16px] p-3">
                     <div className="text-sm">{purposeName(c.purpose)}</div>
                     <div className={clsx('mt-1 text-lg font-semibold tnum', ok ? 'text-good-text' : 'text-critical-text')}>{inrShort(c.held)} <span className="text-sm font-normal text-ink-3">of {inrShort(c.required)}</span></div>
                     <div className="text-xs text-ink-3">{c.complete ? `Holding period ended ${fmtDate(c.holdUntil)}` : `Hold until ${fmtDate(c.holdUntil)}`}{c.lapsed ? ` · ${c.lapsed} lapsed` : ''}</div>

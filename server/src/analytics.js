@@ -86,11 +86,17 @@ const pct = (a, b) => (b ? Math.round((a / b) * 1000) / 10 : null);
 
 export function buildAnalytics(db) {
   const settings = () => ({ ...DEFAULT_SETTINGS, ...getSetting(db, 'monitoring', {}) });
-  const scope = (user) => (user.role === 'institution' ? { sql: 'x.institution_id = ?', p: [user.institution_id] } : { sql: '1=1', p: [] });
+  // Optional region narrows every figure on the dashboard (staff only).
+  const scope = (user, region) => {
+    if (user.role === 'institution') return { sql: 'x.institution_id = ?', p: [user.institution_id] };
+    if (region) return { sql: 'x.institution_id IN (SELECT id FROM institutions WHERE region_code = ?)', p: [region] };
+    return { sql: '1=1', p: [] };
+  };
 
-  function dashboard(user) {
+  function dashboard(user, q = {}) {
     const t = today();
-    const sc = scope(user);
+    const region = q.region || null;
+    const sc = scope(user, region);
     const base = `FROM instruments x JOIN institutions i ON i.id = x.institution_id LEFT JOIN instruments s ON s.id = x.successor_id WHERE ${sc.sql}`;
     const V = validitySql(t);
     const cat = db.prepare(`SELECT
@@ -119,9 +125,12 @@ export function buildAnalytics(db) {
     }
     const mat = db.prepare(`SELECT substr(x.maturity_date,1,7) AS m, SUM(x.hold_until > x.maturity_date AND x.successor_id IS NULL) AS renewal_due,
         SUM(x.hold_until > x.maturity_date AND x.successor_id IS NOT NULL) AS renewal_in,
-        SUM(x.hold_until <= x.maturity_date) AS release_eligible, SUM(x.amount) AS amount
+        SUM(x.hold_until <= x.maturity_date) AS release_eligible, SUM(x.amount) AS amount,
+        SUM(CASE WHEN x.hold_until > x.maturity_date AND x.successor_id IS NULL THEN x.amount ELSE 0 END) AS due_amount,
+        SUM(CASE WHEN x.hold_until > x.maturity_date AND x.successor_id IS NOT NULL THEN x.amount ELSE 0 END) AS in_amount,
+        SUM(CASE WHEN x.hold_until <= x.maturity_date THEN x.amount ELSE 0 END) AS rel_amount
       ${base} AND x.status = 'Active' AND x.maturity_date >= ? AND substr(x.maturity_date,1,7) <= ? GROUP BY m`).all(...sc.p, t, months[11]);
-    const maturityProfile = months.map((m) => ({ month: m, renewal_due: 0, renewal_in: 0, release_eligible: 0, amount: 0, ...mat.find((r) => r.m === m) }));
+    const maturityProfile = months.map((m) => ({ month: m, renewal_due: 0, renewal_in: 0, release_eligible: 0, amount: 0, due_amount: 0, in_amount: 0, rel_amount: 0, ...mat.find((r) => r.m === m) }));
 
     const byRegion = REGIONS.map((r) => ({ code: r.code, name: r.name, ...db.prepare(`SELECT COUNT(*) n, COALESCE(SUM(x.amount),0) amount,
         SUM(x.status = 'Matured' AND x.hold_until > x.maturity_date) AS lapsed
@@ -145,13 +154,30 @@ export function buildAnalytics(db) {
       FROM instrument_events e JOIN instruments x ON x.id = e.instrument_id JOIN institutions i ON i.id = x.institution_id LEFT JOIN users u ON u.id = e.actor_id
       WHERE ${sc.sql} AND e.type NOT IN ('EXTRACTED','SCRUTINY') ORDER BY e.at DESC, e.id DESC LIMIT 12`).all(...sc.p);
 
-    return { today: t, categories: cat, openIssues, maturityProfile, byRegion, byBank, pendingAge, attention, recent, kpis: kpis(user) };
+    // Last 7 weeks (7-day buckets ending today): submissions received vs verified.
+    const weekly = [];
+    for (let k = 6; k >= 0; k--) {
+      const end = addDays(t, -7 * k);
+      const start = addDays(end, -6);
+      const r = db.prepare(`SELECT SUM(substr(x.submitted_at,1,10) BETWEEN ? AND ?) AS submitted, SUM(substr(x.verified_at,1,10) BETWEEN ? AND ?) AS verified
+        FROM instruments x WHERE ${sc.sql}`).get(start, end, start, end, ...sc.p);
+      weekly.push({ start, end, submitted: r.submitted ?? 0, verified: r.verified ?? 0 });
+    }
+    // Last 12 months: verified count and amount taken on record.
+    const trend = [];
+    for (let k = 11; k >= 0; k--) {
+      const d = new Date(t + 'T00:00:00Z'); d.setUTCDate(1); d.setUTCMonth(d.getUTCMonth() - k);
+      const m = d.toISOString().slice(0, 7);
+      const r = db.prepare(`SELECT COUNT(*) n, COALESCE(SUM(x.amount),0) amount FROM instruments x WHERE ${sc.sql} AND substr(x.verified_at,1,7) = ?`).get(...sc.p, m);
+      trend.push({ month: m, verified: r.n, amount: r.amount });
+    }
+    return { today: t, region, categories: cat, openIssues, maturityProfile, byRegion, byBank, pendingAge, attention, recent, weekly, trend, kpis: kpis(user, region) };
   }
 
   /** Measurable improvements the problem statement asks for, computed from the data. */
-  function kpis(user) {
+  function kpis(user, region) {
     const t = today();
-    const sc = scope(user);
+    const sc = scope(user, region);
     const s = settings();
     const verified = db.prepare(`SELECT x.legacy, substr(x.submitted_at,1,10) AS sub, substr(x.verified_at,1,10) AS ver FROM instruments x
       WHERE ${sc.sql} AND x.verified_at IS NOT NULL AND x.verified_at >= ?`).all(...sc.p, addDays(t, -730));
@@ -271,9 +297,38 @@ export function buildAnalytics(db) {
     const rows = r.run(user, q, today());
     return { name, title: r.title, description: r.description, param: r.param ?? null, columns: r.cols.map(([key, label]) => ({ key, label })), rows };
   }
+  /** Dated things coming up: maturities, query deadlines and verification deadlines. */
+  function agenda(user, q = {}) {
+    const t = today();
+    const from = /^\d{4}-\d{2}-\d{2}$/.test(q.from || '') ? q.from : t;
+    const days = Math.min(31, Math.max(1, Number(q.days) || 14));
+    const to = addDays(from, days - 1);
+    const sc = scope(user, q.region);
+    const items = [];
+    for (const x of db.prepare(`SELECT x.id, x.ref_no, x.type, x.instrument_no, x.amount, x.maturity_date, x.hold_until, x.successor_id, i.name AS institution_name
+        FROM instruments x JOIN institutions i ON i.id = x.institution_id WHERE ${sc.sql} AND x.status = 'Active' AND x.maturity_date BETWEEN ? AND ?`).all(...sc.p, from, to)) {
+      const renew = x.hold_until > x.maturity_date;
+      items.push({ date: x.maturity_date, kind: renew ? (x.successor_id ? 'renewal_in' : 'renewal_due') : 'release_eligible', instrument_id: x.id,
+        title: renew ? (x.successor_id ? 'Matures · renewed' : 'Matures · renew') : 'Matures · release',
+        subtitle: `${x.ref_no} · ${x.institution_name}`, amount: x.amount });
+    }
+    for (const r of db.prepare(`SELECT q.due_on, q.instrument_id, x.ref_no, i.name AS institution_name FROM queries q JOIN instruments x ON x.id = q.instrument_id
+        JOIN institutions i ON i.id = x.institution_id WHERE ${sc.sql} AND q.status = 'open' AND q.due_on BETWEEN ? AND ?`).all(...sc.p, from, to)) {
+      items.push({ date: r.due_on, kind: 'query', instrument_id: r.instrument_id, title: 'Query reply due', subtitle: `${r.ref_no} · ${r.institution_name}` });
+    }
+    if (user.role !== 'institution') {
+      for (const r of db.prepare(`SELECT x.id, x.ref_no, x.next_action_due, x.amount, i.name AS institution_name FROM instruments x JOIN institutions i ON i.id = x.institution_id
+          WHERE ${sc.sql} AND x.status IN ('Submitted','Under Scrutiny') AND x.next_action_due BETWEEN ? AND ?`).all(...sc.p, from, to)) {
+        items.push({ date: r.next_action_due, kind: 'verify', instrument_id: r.id, title: 'Verification due', subtitle: `${r.ref_no} · ${r.institution_name}`, amount: r.amount });
+      }
+    }
+    items.sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : a.kind.localeCompare(b.kind)));
+    return { today: t, from, to, items: items.slice(0, 80) };
+  }
+
   const reportList = () => Object.entries(REPORTS).map(([name, r]) => ({ name, title: r.title, description: r.description }));
 
-  return { dashboard, kpis, report, reportList };
+  return { dashboard, kpis, report, reportList, agenda };
 }
 
 export { PURPOSES, DOC_KINDS, REQUIRED_DOCS };

@@ -50,7 +50,7 @@ export default function InstitutionHome() {
           {!todo.length ? <p className="flex items-center gap-2 text-sm text-good-text"><CheckCircle2 className="size-4" />Nothing pending. All deposits are in order.</p> : (
             <ul className="space-y-2">
               {todo.map((t) => (
-                <li key={t.title} className="flex items-center gap-3 rounded-[8px] border border-[var(--hairline)] p-3">
+                <li key={t.title} className="flex items-center gap-3 rounded-[16px] border border-[var(--hairline)] p-3">
                   <span className={clsx('flex size-8 shrink-0 items-center justify-center rounded-full', { critical: 'bg-critical-soft text-critical-text', warning: 'bg-warning-soft text-warning-text', info: 'bg-info-soft text-info-text' }[t.tone])}>{t.icon}</span>
                   <span className="min-w-0 flex-1"><span className="block text-sm font-medium">{t.title}</span><span className="block text-xs text-ink-3">{t.body}</span></span>
                   <Link to={t.to}><Button size="sm">{t.cta}</Button></Link>

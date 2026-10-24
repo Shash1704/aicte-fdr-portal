@@ -30,66 +30,65 @@ export default function Login() {
 
   return (
     <div className="flex min-h-screen items-center justify-center p-3 sm:p-8">
-      <div className="w-full max-w-[1120px]">
-        <div className="eyebrow mb-3 flex justify-between px-1 text-ink-3"><span>.01 · Sign in</span><span>SIH26265 · Team Varangians</span></div>
-        <div className="grid overflow-hidden rounded-[10px] bg-main shadow-[var(--shell-shadow)] lg:grid-cols-[1.1fr_1fr]">
-          <div className="relative hidden min-h-[560px] flex-col p-10 lg:flex">
-            <div className="flex items-start justify-between">
-              <span className="text-[14px] font-bold leading-[1.05] tracking-[0.18em]">SD<br />FDR</span>
-              <span className="eyebrow text-ink-3">AICTE</span>
-            </div>
-            <div className="my-auto text-center">
-              <div className="eyebrow text-ink-3">— Submit · verify · track · release —</div>
-              <h1 className="mt-3 text-[72px] font-bold leading-none tracking-[0.1em]">SD/FDR</h1>
-              <p className="eyebrow mt-4 text-ink-3">Security deposit & FDR portal</p>
-            </div>
-            <ul className="grid grid-cols-2 gap-x-8 gap-y-5">
-              {FEATURES.map((f) => (
-                <li key={f.title} className="flex gap-3">
-                  <f.icon className="mt-0.5 size-4 shrink-0 text-ink-2" strokeWidth={1.6} />
-                  <div className="text-xs leading-relaxed text-ink-3"><span className="font-medium text-ink-2">{f.title}.</span> {f.body}</div>
-                </li>
-              ))}
-            </ul>
+      <div className="grid w-full max-w-[1160px] grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[1.15fr_1fr]">
+        <div className="hero relative hidden min-h-[620px] flex-col overflow-hidden rounded-[28px] p-10 lg:flex">
+          <div className="flex items-center justify-between">
+            <LogoMark className="size-11" />
+            <span className="rounded-full bg-white/10 px-3 py-1 text-[11px] font-semibold text-white/70">AICTE · Regulation Bureau</span>
           </div>
+          <div className="my-auto">
+            <span className="rounded-full bg-accent px-3 py-1 text-[11px] font-bold text-accent-ink">SD / FDR portal</span>
+            <h1 className="mt-5 text-[52px] font-extrabold leading-[1.02]">Every deposit<br />bank-confirmed.<br /><span className="text-accent">Every maturity watched.</span></h1>
+            <p className="mt-5 max-w-md text-sm leading-relaxed text-white/60">Submit, verify, track and release security deposits and FDRs in one place — with the bank's own record beside every field.</p>
+          </div>
+          <ul className="grid grid-cols-2 gap-3">
+            {FEATURES.map((f) => (
+              <li key={f.title} className="flex gap-3 rounded-[18px] bg-white/[0.06] p-4">
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-accent text-accent-ink"><f.icon className="size-4" strokeWidth={2} /></span>
+                <div className="text-xs leading-relaxed text-white/55"><span className="block font-semibold text-white">{f.title}</span>{f.body}</div>
+              </li>
+            ))}
+          </ul>
+        </div>
 
-          <div className="glass m-0 rounded-none px-6 py-10 sm:px-12 lg:m-4 lg:rounded-[8px]">
-            <div className="mb-8 flex items-center gap-3 lg:hidden">
-              <LogoMark className="size-10" />
-              <div>
-                <div className="eyebrow text-ink-3">AICTE</div>
-                <div className="text-lg font-semibold uppercase tracking-[0.1em]">SD/FDR Portal</div>
+        <div className="glass min-w-0 rounded-[28px] px-5 py-10 sm:px-12">
+          <div className="mb-8 flex items-center gap-3 lg:hidden">
+            <LogoMark className="size-10" />
+            <div>
+              <div className="eyebrow text-ink-3">AICTE</div>
+              <div className="text-lg font-bold">SD/FDR Portal</div>
+            </div>
+          </div>
+          <form className="mx-auto max-w-sm" onSubmit={(e) => { e.preventDefault(); submit(); }}>
+            <h2 className="text-[30px]">Sign in</h2>
+            <p className="eyebrow mt-1.5 text-ink-3">AICTE officials and registered institutions</p>
+            {DEMO && <p className="mt-5 rounded-[16px] bg-accent-soft px-4 py-3 text-xs leading-relaxed text-ink-2">Live demo: runs entirely in your browser with synthetic data. Pick a demo account below.</p>}
+            <div className="mt-6 space-y-4">
+              <Field label="Username"><Input autoComplete="username" value={username} onChange={(e) => setUsername(e.target.value)} required /></Field>
+              <Field label="Password"><Input type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required /></Field>
+              <ErrorBox error={error} />
+              <Button variant="primary" className="w-full" loading={busy} type="submit">Sign in</Button>
+            </div>
+          </form>
+          {!!demo.length && (
+            <div className="mx-auto mt-9 max-w-sm">
+              <div className="mb-3 flex items-baseline justify-between text-xs text-ink-3"><span className="font-semibold text-ink-2">Demo accounts</span><span>password&nbsp;<code className="text-ink-2">Aicte@2026</code></span></div>
+              <div className="space-y-2">
+                {demo.map((d) => (
+                  <button key={d.username} onClick={() => submit(d.username, 'Aicte@2026')} disabled={busy}
+                    className="group flex w-full items-center gap-3 rounded-[18px] bg-tile px-3.5 py-2.5 text-left transition hover:bg-surface-3">
+                    <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-surface-3 text-[11px] font-bold text-ink-2 group-hover:bg-accent group-hover:text-accent-ink">{d.username.slice(0, 2).toUpperCase()}</span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-[13px] font-semibold text-ink">{d.role === 'institution' ? 'Institution login' : d.designation}</span>
+                      <span className="block truncate text-[11px] text-ink-3">{d.username} · {d.role === 'institution' ? d.institution_name : d.name}</span>
+                    </span>
+                    <span className="text-ink-3 transition group-hover:translate-x-0.5 group-hover:text-ink">→</span>
+                  </button>
+                ))}
               </div>
             </div>
-            <form className="mx-auto max-w-sm" onSubmit={(e) => { e.preventDefault(); submit(); }}>
-              <h2 className="text-center text-[22px] tracking-[0.14em]">Sign in</h2>
-              <p className="eyebrow mt-2 text-center text-[9.5px] text-ink-3">AICTE officials and registered institutions</p>
-              {DEMO && <p className="mt-6 border-l border-[var(--axis)] pl-3 text-xs leading-relaxed text-ink-3">Live demo: runs entirely in your browser with synthetic data. Pick a demo account below.</p>}
-              <div className="mt-6 space-y-5">
-                <Field label="Username"><Input autoComplete="username" value={username} onChange={(e) => setUsername(e.target.value)} required /></Field>
-                <Field label="Password"><Input type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required /></Field>
-                <ErrorBox error={error} />
-                <div className="flex justify-center pt-2"><Button variant="primary" className="h-11 px-8" loading={busy} type="submit">Sign in →</Button></div>
-              </div>
-            </form>
-            {!!demo.length && (
-              <div className="mx-auto mt-10 max-w-sm">
-                <div className="eyebrow mb-3 text-ink-3">Demo accounts · password <code className="normal-case tracking-normal text-ink-2">Aicte@2026</code></div>
-                <div className="divide-y divide-[var(--hairline)] border-y border-[var(--hairline)]">
-                  {demo.map((d) => (
-                    <button key={d.username} onClick={() => submit(d.username, 'Aicte@2026')} disabled={busy}
-                      className="group flex w-full items-center justify-between gap-3 py-2.5 text-left">
-                      <span className="min-w-0">
-                        <span className="block truncate text-[13px] text-ink-2 group-hover:text-ink">{d.role === 'institution' ? 'Institution login' : d.designation}</span>
-                        <span className="block truncate text-[11px] text-ink-3">{d.username} · {d.role === 'institution' ? d.institution_name : d.name}</span>
-                      </span>
-                      <span className="text-ink-3 transition group-hover:translate-x-0.5 group-hover:text-ink">→</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
+          )}
+          <p className="mt-8 text-center text-[11px] text-muted">SIH26265 · Team Varangians</p>
         </div>
       </div>
     </div>

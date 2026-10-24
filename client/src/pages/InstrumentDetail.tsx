@@ -183,7 +183,7 @@ export default function InstrumentDetail() {
             <ul className="space-y-2">
               {x.documents.map((d) => (
                 <li key={d.id}>
-                  <button className="-mx-2 flex w-full items-start gap-2.5 rounded-[6px] px-2 py-1.5 text-left hover:bg-surface-2" onClick={() => openDocument(d.id).catch((e) => push({ tone: 'critical', title: (e as Error).message }))}>
+                  <button className="-mx-2 flex w-full items-start gap-2.5 rounded-[12px] px-2 py-1.5 text-left hover:bg-surface-2" onClick={() => openDocument(d.id).catch((e) => push({ tone: 'critical', title: (e as Error).message }))}>
                     <FileText className="mt-0.5 size-4 shrink-0 text-ink-3" />
                     <span className="min-w-0 flex-1">
                       <span className="block truncate text-sm">{docName(d.kind)}</span>
@@ -223,7 +223,7 @@ export default function InstrumentDetail() {
 function Banner({ tone, icon, title, children, action }: { tone: 'critical' | 'serious' | 'warning' | 'info'; icon: ReactNode; title: string; children?: ReactNode; action?: ReactNode }) {
   const cls = { critical: 'border-critical/40 bg-critical-soft text-critical-text', serious: 'border-serious/40 bg-serious-soft text-serious-text', warning: 'border-warning/40 bg-warning-soft text-warning-text', info: 'border-info/40 bg-info-soft text-info-text' }[tone];
   return (
-    <div className={clsx('flex flex-wrap items-start gap-3 rounded-[10px] border px-4 py-3', cls)}>
+    <div className={clsx('flex flex-wrap items-start gap-3 rounded-[24px] border px-4 py-3', cls)}>
       <span className="mt-0.5 shrink-0">{icon}</span>
       <div className="min-w-0 flex-1"><div className="text-sm font-semibold">{title}</div>{children && <div className="mt-0.5 text-sm text-ink-2">{children}</div>}</div>
       {action}
@@ -357,7 +357,7 @@ function VerifyModal({ x, onClose, onDone }: { x: Detail; onClose: () => void; o
       <div className="space-y-3">
         <p className="text-sm text-ink-2">How were the details confirmed? The answer is recorded and shown with the instrument, so bank-confirmed and declared-only records are never confused.</p>
         {opts.map((o) => (
-          <label key={o.v} className={clsx('flex cursor-pointer gap-3 rounded-[8px] border p-3', mode === o.v ? 'border-ink' : 'border-[var(--hairline)]', !o.ok && 'cursor-not-allowed opacity-50')}>
+          <label key={o.v} className={clsx('flex cursor-pointer gap-3 rounded-[16px] border p-3', mode === o.v ? 'border-ink' : 'border-[var(--hairline)]', !o.ok && 'cursor-not-allowed opacity-50')}>
             <input type="radio" name="mode" disabled={!o.ok} checked={mode === o.v} onChange={() => setMode(o.v)} className="mt-1" />
             <span><span className="block text-sm font-medium">{o.label}</span><span className="text-xs text-ink-3">{o.why}</span></span>
           </label>

@@ -33,9 +33,9 @@ export default function Reports() {
       <div className="grid grid-cols-[minmax(0,1fr)] gap-5 lg:grid-cols-[260px_minmax(0,1fr)]">
         <nav className="no-print space-y-1" aria-label="Reports">
           {list?.map((r) => (
-            <button key={r.name} onClick={() => set({ name: r.name, days: undefined })} className={clsx('block w-full rounded-[8px] px-3 py-2.5 text-left transition', name === r.name ? 'btn-raised' : 'hover:bg-surface-2')}>
+            <button key={r.name} onClick={() => set({ name: r.name, days: undefined })} className={clsx('block w-full rounded-[16px] px-3 py-2.5 text-left transition', name === r.name ? 'btn-raised' : 'hover:bg-surface-2')}>
               <span className="block text-sm font-medium">{r.title}</span>
-              <span className={clsx('block text-[11px]', name === r.name ? 'text-white/60' : 'text-ink-3')}>{r.description}</span>
+              <span className={clsx('block text-[11px]', name === r.name ? 'text-black/60' : 'text-ink-3')}>{r.description}</span>
             </button>
           ))}
         </nav>

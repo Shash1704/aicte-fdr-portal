@@ -80,7 +80,8 @@ export function buildRouter({ db, engine, service, analytics, audit, store, bus 
   });
 
   // ---------- dashboard ----------
-  r.get('/dashboard', (req, res) => res.json(analytics.dashboard(req.user)));
+  r.get('/dashboard', (req, res) => res.json(analytics.dashboard(req.user, req.query)));
+  r.get('/agenda', (req, res) => res.json(analytics.agenda(req.user, req.query)));
 
   // ---------- instruments ----------
   r.get('/instruments', (req, res) => {

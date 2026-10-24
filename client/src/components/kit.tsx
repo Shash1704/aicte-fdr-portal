@@ -7,36 +7,15 @@ import { useLookups } from '../lib/context';
 import type { InstrumentRow } from '../lib/types';
 import { Button, IssueDot, StatusBadge, ValidityBadge, VerificationBadge, BankBadge } from './ui';
 
-export const pillLink = 'eyebrow flex items-center gap-1.5 rounded-[4px] border border-[var(--axis)] px-3 py-1.5 text-ink-2 hover:border-ink hover:text-ink';
+export const pillLink = 'flex items-center gap-1.5 rounded-full bg-surface-2 px-3.5 py-2 text-xs font-semibold text-ink-2 hover:bg-surface-3 hover:text-ink';
 
 export function SectionNo({ n, label }: { n: string; label: string }) {
   return <div className="eyebrow flex items-center gap-3 text-ink-3"><span className="text-ink-2">.{n}</span><span className="h-px w-8 bg-[var(--axis)]" />{label}</div>;
 }
 
-export function InkStat({ to, alt, label, value, sub, foot }: { to: string; alt?: boolean; label: string; value: ReactNode; sub: string; foot: Array<[string, ReactNode]> }) {
-  return (
-    <Link to={to} className={clsx('block rounded-[10px] p-5 shadow-[var(--shadow)] transition hover:-translate-y-0.5', alt ? 'ink-card-alt' : 'ink-card')}>
-      <div className="eyebrow text-white/70">{label}</div>
-      <div className="mt-2 text-[34px] font-semibold leading-none tracking-[0.03em] tnum">{value}</div>
-      <div className="mt-1.5 text-xs text-white/75">{sub}</div>
-      <div className="mt-5 flex items-end justify-between gap-3">
-        <div className="flex flex-wrap gap-5">
-          {foot.map(([l, v]) => (
-            <div key={l}>
-              <div className="text-[15px] font-medium leading-none tnum">{v}</div>
-              <div className="mt-1 text-[9.5px] uppercase tracking-[0.14em] text-white/60">{l}</div>
-            </div>
-          ))}
-        </div>
-        <span className="flex shrink-0" aria-hidden><span className="size-6 rounded-full bg-white/90" /><span className="-ml-2.5 size-6 rounded-full bg-white/45" /></span>
-      </div>
-    </Link>
-  );
-}
-
 export function StripKpi({ icon, label, value, sub, to, tone }: { icon: ReactNode; label: string; value: number; sub: string; to: string; tone?: 'accent' | 'critical' | 'warning' }) {
   return (
-    <Link to={to} className="group flex items-center gap-3 rounded-[10px] p-3 transition-colors hover:bg-surface-2 sm:p-4">
+    <Link to={to} className="group flex items-center gap-3 rounded-[24px] p-3 transition-colors hover:bg-surface-2 sm:p-4">
       <span className={clsx('flex size-11 shrink-0 items-center justify-center rounded-full',
         tone === 'accent' ? 'bg-accent text-accent-ink' : tone === 'critical' ? 'bg-critical-soft text-critical-text' : tone === 'warning' ? 'bg-warning-soft text-warning-text' : 'bg-accent-soft text-accent-text')}>{icon}</span>
       <span className="min-w-0">
