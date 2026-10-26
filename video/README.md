@@ -42,7 +42,7 @@ Output: `out/Varangians_SIH26265_Demo.mp4` (1920×1080, captions as a switchable
 
 ## How it works
 
-- `record.mjs` opens the live demo at a 1536×864 viewport (rendered at 1920×1080) and runs one timeline.
+- `record.mjs` opens the live demo at a 1920×1080 viewport (the same size as the video; the recorder never enlarges a smaller page, it leaves a grey border) and runs one timeline.
   Each step is pinned to the second its line is spoken (`at(seconds, label)`); the run reports any step
   that started late. It shows a cursor, click ripples, a lime highlight box, the part title, the title
   and closing cards, and the release letter, all drawn inside the page.

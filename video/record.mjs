@@ -18,14 +18,14 @@ const INIT = () => {
     if (document.getElementById('__cursor')) return;
     const st = document.createElement('style');
     st.textContent = `
-      #__cursor{position:fixed;left:0;top:0;width:26px;height:26px;z-index:2147483647;pointer-events:none;transform:translate(-3px,-2px);transition:transform .05s}
+      #__cursor{position:fixed;left:0;top:0;width:30px;height:30px;z-index:2147483647;pointer-events:none;transform:translate(-3px,-2px);transition:transform .05s}
       #__cursor svg{filter:drop-shadow(0 2px 4px rgba(0,0,0,.6))}
       .__ripple{position:fixed;width:44px;height:44px;margin:-22px 0 0 -22px;border-radius:50%;border:3px solid #d8f06a;z-index:2147483646;pointer-events:none;animation:__rip .55s ease-out forwards}
       @keyframes __rip{from{transform:scale(.3);opacity:1}to{transform:scale(1.4);opacity:0}}
       #__hl{position:fixed;z-index:2147483645;pointer-events:none;border:3px solid #d8f06a;border-radius:22px;box-shadow:0 0 0 9999px rgba(0,0,0,.28),0 0 28px rgba(216,240,106,.55);opacity:0;transition:opacity .25s,left .35s,top .35s,width .35s,height .35s}
       #__card{position:fixed;inset:0;z-index:2147483640;background:radial-gradient(120% 90% at 50% 0%,#202020 0%,#0b0b0b 100%);color:#f4f4f4;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .45s;pointer-events:none;font-family:"Plus Jakarta Sans Variable","Plus Jakarta Sans",system-ui,sans-serif}
       #__card.on{opacity:1}
-      #__card .wrap{width:min(1180px,86vw)}
+      #__card .wrap{width:min(1180px,70vw);zoom:1.25}
       #__card .eyebrow{font-size:15px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#9a9a9a}
       #__card h1{font-size:68px;line-height:1.04;font-weight:800;margin:18px 0 0;letter-spacing:-.01em}
       #__card .lime{color:#d8f06a}
@@ -37,15 +37,15 @@ const INIT = () => {
       #__card li .dot{flex:none;width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:20px}
       #__card .logo{width:64px;height:64px}
       #__card .link{margin-top:34px;display:inline-block;background:#d8f06a;color:#141414;font-size:34px;font-weight:800;border-radius:999px;padding:16px 34px}
-      #__chip{position:fixed;top:22px;left:50%;transform:translateX(-50%);z-index:2147483639;background:#050505;color:#f4f4f4;border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:8px 18px 8px 8px;font:600 15px "Plus Jakarta Sans Variable",system-ui,sans-serif;display:flex;align-items:center;gap:10px;opacity:0;transition:opacity .35s;pointer-events:none}
+      #__chip{position:fixed;top:22px;left:50%;transform:translateX(-50%);z-index:2147483639;background:#050505;color:#f4f4f4;border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:8px 18px 8px 8px;font:600 15px "Plus Jakarta Sans Variable",system-ui,sans-serif;display:flex;align-items:center;gap:10px;opacity:0;transition:opacity .35s;pointer-events:none;zoom:1.2}
       #__chip b{background:#d8f06a;color:#141414;border-radius:999px;width:28px;height:28px;display:flex;align-items:center;justify-content:center}
       #__letter{position:fixed;inset:0;z-index:2147483641;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .35s;pointer-events:none}
-      #__letter img{width:min(1180px,80vw);border-radius:18px;box-shadow:0 30px 80px rgba(0,0,0,.7)}
+      #__letter img{width:min(1475px,80vw);border-radius:18px;box-shadow:0 30px 80px rgba(0,0,0,.7)}
       html.__carding #__cursor{opacity:0}`;
     document.documentElement.appendChild(st);
     const c = document.createElement('div');
     c.id = '__cursor';
-    c.innerHTML = '<svg width="26" height="26" viewBox="0 0 24 24"><path d="M4 2l15 9.5-6.6 1.4L9.8 20z" fill="#fff" stroke="#141414" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+    c.innerHTML = '<svg width="30" height="30" viewBox="0 0 24 24"><path d="M4 2l15 9.5-6.6 1.4L9.8 20z" fill="#fff" stroke="#141414" stroke-width="1.6" stroke-linejoin="round"/></svg>';
     document.documentElement.appendChild(c);
     const pos = window.__pos || { x: innerWidth / 2, y: innerHeight / 2 };
     c.style.left = pos.x + 'px'; c.style.top = pos.y + 'px';
@@ -68,7 +68,9 @@ const LOGO = '<svg class="logo" viewBox="0 0 40 40"><path d="M8 31 19 13M18 31 2
 // ---------------- runner ----------------
 const browser = await chromium.launch();
 const ctx = await browser.newContext({
-  viewport: { width: 1536, height: 864 }, deviceScaleFactor: 1.25,
+  // The recorder only shrinks pages to fit, never enlarges: the viewport must match the video size,
+  // or the page sits in the top-left corner with a grey border around it.
+  viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 1,
   recordVideo: { dir: OUT, size: { width: 1920, height: 1080 } },
 });
 await ctx.addInitScript(INIT);
@@ -156,7 +158,7 @@ const cardSection = (title) => page.locator('section.glass', { has: page.locator
 await page.goto(URL);
 await page.locator('button', { hasText: 'Director, Regulation Bureau' }).waitFor({ timeout: 90000 });
 await ensure();
-await page.mouse.move(980, 520);
+await page.mouse.move(1225, 650);
 t0 = Date.now();
 fs.writeFileSync(path.join(OUT, 'trim.txt'), String((t0 - videoStart) / 1000));
 
